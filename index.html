@@ -334,6 +334,7 @@ var ymax
 var material
 var delta = []
 var cutout = []
+var cutout2 = []
 var cr = 10
 var offset = 0
 var scale = 100
@@ -363,6 +364,7 @@ function reload(){
    pockets = []
    pocket_o = []
    cutout = []
+   cutout2 = []
    connector = []
    first_pass = []
    makeBrick()
@@ -396,31 +398,45 @@ function makeCutout(){
 
 
 for (i=0;i<=100;i++) {
-
-
    if(i<=25){
-      cutout.push({X:(xmax)-(5)+(tool_diameter/2*25.4)+Math.sin((Math.PI*2)/scale*i)*5,Y:ymax-5+(tool_diameter/2*25.4)+Math.cos((Math.PI*2)/scale*i)*5});
+      cutout.push({X:(xmax)-(5)+(tool_diameter*25.4)+Math.sin((Math.PI*2)/scale*i)*5,Y:ymax-5+(tool_diameter*25.4)+Math.cos((Math.PI*2)/scale*i)*5});
    }
    else if((i>25)&&(i<=50)){
-      cutout.push({X:(xmax)-(5)+(tool_diameter/2*25.4)+Math.sin((Math.PI*2)/scale*i)*5,Y:ymin+5-(tool_diameter/2*25.4)+Math.cos((Math.PI*2)/scale*i)*5});
+      cutout.push({X:(xmax)-(5)+(tool_diameter*25.4)+Math.sin((Math.PI*2)/scale*i)*5,Y:ymin+5-(tool_diameter*25.4)+Math.cos((Math.PI*2)/scale*i)*5});
    }
    else if((i>50)&&(i<=75)){
-      cutout.push({X:xmin+(5)-(tool_diameter/2*25.4)+Math.sin((Math.PI*2)/scale*i)*5,Y:ymin-(tool_diameter/2*25.4)+5+Math.cos((Math.PI*2)/scale*i)*5});      
+      cutout.push({X:xmin+(5)-(tool_diameter*25.4)+Math.sin((Math.PI*2)/scale*i)*5,Y:ymin-(tool_diameter*25.4)+5+Math.cos((Math.PI*2)/scale*i)*5});      
    }
    else if((i>75)&&(i<=100)){
-      cutout.push({X:xmin+(5)-(tool_diameter/2*25.4)+Math.sin((Math.PI*2)/scale*i)*5,Y:ymax-5+(tool_diameter/2*25.4)+Math.cos((Math.PI*2)/scale*i)*5});     
+      cutout.push({X:xmin+(5)-(tool_diameter*25.4)+Math.sin((Math.PI*2)/scale*i)*5,Y:ymax-5+(tool_diameter*25.4)+Math.cos((Math.PI*2)/scale*i)*5});     
       if(i==100){
-         cutout.push({X:((xmax)-(5)+(tool_diameter/2*25.4)),Y:(ymax+(tool_diameter/2*25.4))});
+         cutout.push({X:((xmax)-(5)+(tool_diameter*25.4)),Y:(ymax+(tool_diameter*25.4))});
       }
    }
+}
 
+for (i=0;i<=100;i++) {
+   if(i<=25){
+      cutout2.push({X:(xmax)-(5)+(tool_diameter/2*25.4)+Math.sin((Math.PI*2)/scale*i)*5,Y:ymax-5+(tool_diameter/2*25.4)+Math.cos((Math.PI*2)/scale*i)*5});
+   }
+   else if((i>25)&&(i<=50)){
+      cutout2.push({X:(xmax)-(5)+(tool_diameter/2*25.4)+Math.sin((Math.PI*2)/scale*i)*5,Y:ymin+5-(tool_diameter/2*25.4)+Math.cos((Math.PI*2)/scale*i)*5});
+   }
+   else if((i>50)&&(i<=75)){
+      cutout2.push({X:xmin+(5)-(tool_diameter/2*25.4)+Math.sin((Math.PI*2)/scale*i)*5,Y:ymin-(tool_diameter/2*25.4)+5+Math.cos((Math.PI*2)/scale*i)*5});      
+   }
+   else if((i>75)&&(i<=100)){
+      cutout2.push({X:xmin+(5)-(tool_diameter/2*25.4)+Math.sin((Math.PI*2)/scale*i)*5,Y:ymax-5+(tool_diameter/2*25.4)+Math.cos((Math.PI*2)/scale*i)*5});     
+      if(i==100){
+         cutout2.push({X:((xmax)-(5)+(tool_diameter/2*25.4)),Y:(ymax+(tool_diameter/2*25.4))});
+      }
+   }
 }
 
 }
 
 
 function makeBrick() {
-
 
 //console.log(dots);
 
@@ -447,6 +463,10 @@ makeCutout()
 for(i=0;i<cutout.length;i++){
 cutout[i].X=parseInt((cutout[i].X*scale).toFixed(0));
 cutout[i].Y=parseInt((cutout[i].Y*scale).toFixed(0));
+
+cutout2[i].X=parseInt((cutout2[i].X*scale).toFixed(0));
+cutout2[i].Y=parseInt((cutout2[i].Y*scale).toFixed(0));
+
 }
 //console.log(cutout);
 makeConnector()
@@ -456,11 +476,12 @@ for(i=0;i<connector.length;i++){
    connector[i][j].Y=parseInt((connector[i][j].Y*scale).toFixed(0));
    }
 }
-//console.log(connector)
+
 
 simple_paths=connector
 simple_paths.push(cutout)
-
+//simple_paths.push(cutout2)
+console.log(simple_paths)
 
 //////
 
@@ -576,12 +597,10 @@ cutout=cutout[0]
 function make(){
 
 var pass = 1
-
 var pass_no=1
-
 var pass_depth = 2
 
-
+//part A
 //header
 g+="g21\n"
 g+="g0z1\n"
@@ -589,13 +608,11 @@ g+="m4\n"
 g+="g4p2\n"
 
 for(i=0;i<first_pass.length;i++){
-
-
    for(j=0;j<first_pass[i].length;j++){
       for(j2=0;j2<first_pass[i][j].length;j2++){
             if(j2==0){
-               g+= "g1x" + ((first_pass[i][j][j2].X/1000)).toFixed(2) + "y" + (first_pass[i][j][j2].Y/1000).toFixed(2) + "f300\n"
-               g+="g1z-4f200\n"
+               g+= "g0x" + ((first_pass[i][j][j2].X/1000)).toFixed(2) + "y" + (first_pass[i][j][j2].Y/1000).toFixed(2) + "\n"
+               g+="g1z-2f200\n"
             }
             else{              
                g+= "g1x" + ((first_pass[i][j][j2].X/1000)).toFixed(2) + "y" + (first_pass[i][j][j2].Y/1000).toFixed(2) + "f300\n"
@@ -608,9 +625,26 @@ for(i=0;i<first_pass.length;i++){
 
 g+="g0z-1"
 
+for(i=0;i<first_pass.length;i++){
+   for(j=0;j<first_pass[i].length;j++){
+      for(j2=0;j2<first_pass[i][j].length;j2++){
+            if(j2==0){
+               g+= "g0x" + ((first_pass[i][j][j2].X/1000)).toFixed(2) + "y" + (first_pass[i][j][j2].Y/1000).toFixed(2) + "\n"
+               g+="g1z-4f200\n"
+            }
+            else{              
+               g+= "g1x" + ((first_pass[i][j][j2].X/1000)).toFixed(2) + "y" + (first_pass[i][j][j2].Y/1000).toFixed(2) + "f300\n"
+            }
+       }
+   
+      }
+
+}
+
+
+g+="g0z-1"
+
 for(i=0;i<pocket.length;i++){
-
-
    for(j=0;j<pocket[i].length;j++){
       for(j2=0;j2<pocket[i][j].length;j2++){
             if(j2==0){
@@ -618,7 +652,7 @@ for(i=0;i<pocket.length;i++){
                g+="g1z-6f200\n"
             }
             else{              
-               g+= "g1x" + ((pocket[i][j][j2].X/1000)).toFixed(2) + "y" + (pocket[i][j][j2].Y/1000) + "f300\n"
+               g+= "g1x" + ((pocket[i][j][j2].X/1000)).toFixed(2) + "y" + (pocket[i][j][j2].Y/1000).toFixed(2) + "f300\n"
             }
        }
       g+='g0z-1\n'
@@ -628,13 +662,17 @@ for(i=0;i<pocket.length;i++){
 }
 
 g+= "g0z1\n"
-g+= "g0x" + ((cutout[0].X/1000)).toFixed(2) + "y" + (cutout[0].Y/1000) + "\n"
+
 
 j=8
 while(j<=16){
+	g+= "g0x" + ((cutout[0].X/1000)).toFixed(2) + "y" + (cutout[0].Y/1000).toFixed(2) + "\n"
 	g+="g1z-" + j + "f200\n"
-for(i=0;i<cutout.length;i++){
-	g+= "g1x" + ((cutout[i].X/1000)).toFixed(2) + "y" + (cutout[i].Y/1000) + "f300\n"
+	for(i=0;i<cutout.length;i++){
+	g+= "g1x" + ((cutout[i].X/1000)).toFixed(2) + "y" + (cutout[i].Y/1000).toFixed(2) + "f300\n"
+	}
+	for(i=0;i<cutout2.length;i++){
+	g+= "g1x" + ((cutout2[i].X/1000)).toFixed(2) + "y" + (cutout2[i].Y/1000).toFixed(2) + "f300\n"
 	}
 	j=j+2
 }
@@ -643,14 +681,94 @@ g+="g0z5\n"
 g+="m5\n"
 g+="m30\n"
 
+
 fabmo.submitJob({
    file : g,
    filename : 'brick.g',
-   name : snapw + " x " + snaph + " BRICK",
+   name : snapw + " x " + snaph + " BRICK MOLD PT B",
    description : (10*snapw) + " x " + (10*snaph) + " x " + "10 mm" 
 });
 
+
 g=""
+
+
+pass = 1
+pass_no=1
+pass_depth = 2
+
+//PT B
+g+="g21\n"
+g+="g0z1\n"
+g+="m4\n"
+g+="g4p2\n"
+
+//console.log(first_pass)
+//remove last array
+//regenerate cut out, and push 
+
+for(i=0;i<first_pass.length;i++){
+   for(j=0;j<first_pass[i].length;j++){
+      for(j2=0;j2<first_pass[i][j].length;j2++){
+            if(j2==0){
+               g+= "g0x" + ((first_pass[i][j][j2].X/1000)).toFixed(2) + "y" + (first_pass[i][j][j2].Y/1000).toFixed(2) + "\n"
+               g+="g1z-2f200\n"
+            }
+            else{              
+               g+= "g1x" + ((first_pass[i][j][j2].X/1000)).toFixed(2) + "y" + (first_pass[i][j][j2].Y/1000).toFixed(2) + "f300\n"
+            }
+       }
+       }
+}
+g+="g0z-1"
+
+for(i=0;i<first_pass.length;i++){
+   for(j=0;j<first_pass[i].length;j++){
+      for(j2=0;j2<first_pass[i][j].length;j2++){
+            if(j2==0){
+               g+= "g0x" + ((first_pass[i][j][j2].X/1000)).toFixed(2) + "y" + (first_pass[i][j][j2].Y/1000).toFixed(2) + "\n"
+               g+="g1z-4f200\n"
+            }
+            else{              
+               g+= "g1x" + ((first_pass[i][j][j2].X/1000)).toFixed(2) + "y" + (first_pass[i][j][j2].Y/1000).toFixed(2) + "f300\n"
+            }
+       }
+       }
+}
+
+
+
+g+="g0z-1"
+
+for(i=0;i<pocket2.length;i++){
+
+   for(j=0;j<pocket2[i].length;j++){
+            if(j==0){
+               g+= "g0x" + ((pocket2[i][j].X/1000)).toFixed(2) + "y" + ((pocket2[i][j].Y/1000)).toFixed(2) + "\n"
+               g+="g1z-6.5f200\n"
+            }
+            else{              
+               g+= "g1x" + ((pocket2[i][j].X/1000)).toFixed(2) + "y" + (pocket2[i][j].Y/1000).toFixed(2) + "f300\n"
+            } 
+      }
+      g+="g0z-1"
+}
+
+
+g+="g0z5\n"
+g+="m5\n"
+g+="m30\n"
+
+//console.log(g)
+
+fabmo.submitJob({
+   file : g,
+   filename : 'brick.g',
+   name : snapw + " x " + snaph + " BRICK MOLD PT A",
+   description : (10*snapw) + " x " + (10*snaph) + " x " + "10 mm" 
+});
+
+
 
 }
 
