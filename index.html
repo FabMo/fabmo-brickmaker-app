@@ -311,12 +311,6 @@ strokeWeight(1/sf2);
 <script>
 
 var g = ""
-var gcode = []                      
-var paths = []
-var shapes = []
-var fontFileName
-var points = []
-var points = []
 var dots = []
 var tool_diameter
 var pocket = []
@@ -324,9 +318,8 @@ var pockets = []
 var pocket_o = []
 var offsetted_paths = []
 var pocket2 = []
+var points = []
 
-var x = []
-var y = []
 var xmin
 var xmax
 var ymin
@@ -345,20 +338,10 @@ var first_pass = []
 
 function reload(){
 
-   points = []
-   count = []
-   shapes = []
-   test = []
-   test2 = []
-   points = []
-   path = ""
-   paths = []
-   xy = []
-   xy_offset = []
+
    dots = []
-   svg = []
+	points = []
    offsetted_paths = []
-   delta = []
    tabs=[]
    pocket = []
    pockets = []
@@ -432,6 +415,26 @@ for (i=0;i<=100;i++) {
       }
    }
 }
+
+for (i=0;i<=100;i++) {
+   if(i<=25){
+      tabs.push({X:(xmax)-(5)+(tool_diameter/2*25.4)+Math.sin((Math.PI*2)/scale*i)*5,Y:ymax-5+(tool_diameter/2*25.4)+Math.cos((Math.PI*2)/scale*i)*5});
+   }
+   else if((i>25)&&(i<=50)){
+      tabs.push({X:(xmax)-(5)+(tool_diameter/2*25.4)+Math.sin((Math.PI*2)/scale*i)*5,Y:ymin+5-(tool_diameter/2*25.4)+Math.cos((Math.PI*2)/scale*i)*5});
+   }
+   else if((i>50)&&(i<=75)){
+      tabs.push({X:xmin+(5)-(tool_diameter/2*25.4)+Math.sin((Math.PI*2)/scale*i)*5,Y:ymin-(tool_diameter/2*25.4)+5+Math.cos((Math.PI*2)/scale*i)*5});      
+   }
+   else if((i>75)&&(i<=100)){
+      tabs.push({X:xmin+(5)-(tool_diameter/2*25.4)+Math.sin((Math.PI*2)/scale*i)*5,Y:ymax-5+(tool_diameter/2*25.4)+Math.cos((Math.PI*2)/scale*i)*5});     
+      if(i==100){
+         tabs.push({X:((xmax)-(5)+(tool_diameter/2*25.4)),Y:(ymax+(tool_diameter/2*25.4))});
+      }
+   }
+}
+
+
 
 }
 
@@ -542,7 +545,7 @@ pocket_o = pocket[0]
 
 pocket = pocket.reverse();
 
-pocket[0].push(cutout)
+pocket[0].push(cutout.reverse())
 
 cutout = [cutout]
 
@@ -607,16 +610,16 @@ g+="g0z1\n"
 g+="m4\n"
 g+="g4p2\n"
 
+
+first_pass.splice(0,1)
+
+g+= "g0x" + ((first_pass[0][0][0].X/1000)).toFixed(2) + "y" + (first_pass[0][0][0].Y/1000).toFixed(2) + "\n"
+g+="g1z-2f200\n"
+
 for(i=0;i<first_pass.length;i++){
    for(j=0;j<first_pass[i].length;j++){
-      for(j2=0;j2<first_pass[i][j].length;j2++){
-            if(j2==0){
-               g+= "g0x" + ((first_pass[i][j][j2].X/1000)).toFixed(2) + "y" + (first_pass[i][j][j2].Y/1000).toFixed(2) + "\n"
-               g+="g1z-2f200\n"
-            }
-            else{              
+      for(j2=0;j2<first_pass[i][j].length;j2++){          
                g+= "g1x" + ((first_pass[i][j][j2].X/1000)).toFixed(2) + "y" + (first_pass[i][j][j2].Y/1000).toFixed(2) + "f300\n"
-            }
        }
    
       }
@@ -624,17 +627,15 @@ for(i=0;i<first_pass.length;i++){
 }
 
 g+="g0z-1"
+g+= "g0x" + ((first_pass[0][0][0].X/1000)).toFixed(2) + "y" + (first_pass[0][0][0].Y/1000).toFixed(2) + "\n"
+g+="g1z-4f200\n"
 
 for(i=0;i<first_pass.length;i++){
    for(j=0;j<first_pass[i].length;j++){
       for(j2=0;j2<first_pass[i][j].length;j2++){
-            if(j2==0){
-               g+= "g0x" + ((first_pass[i][j][j2].X/1000)).toFixed(2) + "y" + (first_pass[i][j][j2].Y/1000).toFixed(2) + "\n"
-               g+="g1z-4f200\n"
-            }
-            else{              
+            
                g+= "g1x" + ((first_pass[i][j][j2].X/1000)).toFixed(2) + "y" + (first_pass[i][j][j2].Y/1000).toFixed(2) + "f300\n"
-            }
+
        }
    
       }
@@ -681,7 +682,6 @@ g+="g0z5\n"
 g+="m5\n"
 g+="m30\n"
 
-
 fabmo.submitJob({
    file : g,
    filename : 'brick.g',
@@ -689,9 +689,7 @@ fabmo.submitJob({
    description : (10*snapw) + " x " + (10*snaph) + " x " + "10 mm" 
 });
 
-
 g=""
-
 
 pass = 1
 pass_no=1
@@ -704,37 +702,29 @@ g+="m4\n"
 g+="g4p2\n"
 
 //console.log(first_pass)
+g+= "g0x" + ((first_pass[0][0][0].X/1000)).toFixed(2) + "y" + (first_pass[0][0][0].Y/1000).toFixed(2) + "\n"
+g+="g1z-2f200\n"
 
 for(i=0;i<first_pass.length;i++){
    for(j=0;j<first_pass[i].length;j++){
-      for(j2=0;j2<first_pass[i][j].length;j2++){
-            if(j2==0){
-               g+= "g0x" + ((first_pass[i][j][j2].X/1000)).toFixed(2) + "y" + (first_pass[i][j][j2].Y/1000).toFixed(2) + "\n"
-               g+="g1z-2f200\n"
-            }
-            else{              
+      for(j2=0;j2<first_pass[i][j].length;j2++){          
                g+= "g1x" + ((first_pass[i][j][j2].X/1000)).toFixed(2) + "y" + (first_pass[i][j][j2].Y/1000).toFixed(2) + "f300\n"
-            }
+          
        }
        }
 }
 g+="g0z-1"
+g+= "g0x" + ((first_pass[0][0][0].X/1000)).toFixed(2) + "y" + (first_pass[0][0][0].Y/1000).toFixed(2) + "\n"
+g+="g1z-4f200\n"
 
 for(i=0;i<first_pass.length;i++){
    for(j=0;j<first_pass[i].length;j++){
-      for(j2=0;j2<first_pass[i][j].length;j2++){
-            if(j2==0){
-               g+= "g0x" + ((first_pass[i][j][j2].X/1000)).toFixed(2) + "y" + (first_pass[i][j][j2].Y/1000).toFixed(2) + "\n"
-               g+="g1z-4f200\n"
-            }
-            else{              
+      for(j2=0;j2<first_pass[i][j].length;j2++){            
                g+= "g1x" + ((first_pass[i][j][j2].X/1000)).toFixed(2) + "y" + (first_pass[i][j][j2].Y/1000).toFixed(2) + "f300\n"
-            }
+
        }
        }
 }
-
-
 
 g+="g0z-1"
 
@@ -766,9 +756,7 @@ fabmo.submitJob({
    description : (10*snapw) + " x " + (10*snaph) + " x " + "10 mm" 
 });
 
-
 }
-
 
 // toggle full screen
 function toggleFullScreen() {
