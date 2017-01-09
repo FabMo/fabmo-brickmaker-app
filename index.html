@@ -6,10 +6,7 @@
 
 
 <script src="js/jquery-1.11.2.min.js"></script>
-<script src="js/libs/fabmo.js"></script>
-    <script type="text/javascript">
-        var fabmo = new FabMoDashboard();
-    </script>
+<script src="js/libs/fabmo.min.js"></script>
 <script src="js/control.js"></script>
 <script src="js/config.js"></script>
 <script src="js/jquery.mobile-1.4.5.js"></script>
@@ -304,6 +301,8 @@ strokeWeight(1/sf2);
 </script>
 
 <script>
+
+var fabmo = new FabMoDashboard()
 
 var g = ""
 var dots = []
@@ -726,7 +725,7 @@ first_pass.push([tabs[1]])
 //PT B
 g+="g21\n"
 g+="g0z1\n"
-g+="m4\n"
+g+="m3\n"
 g+="g4p2\n"
 
 //console.log(first_pass)
